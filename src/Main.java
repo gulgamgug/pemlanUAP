@@ -7,7 +7,12 @@ public class Main {
     public static void main(String[] args) {
         ArrayList<Kendaraan> daftarKendaraan = new ArrayList<>();
 
-        daftarKendaraan.add(new Motor("VESPA-01", "Vespa Matic 2020", 100000, true,true ));
+        daftarKendaraan.add(new Motor("VESPA-01", "Vespa Matic 2020", 100000, true, true));
+        daftarKendaraan.add(new Motor("CBR-02", "Honda CBR 150R", 150000, true, false));
+        daftarKendaraan.add(new Motor("BEAT-03", "Honda Beat 2022", 70000, true, true));
+        daftarKendaraan.add(new Mobil("AVZ-01", "Toyota Avanza", 350000, true, 7));
+        daftarKendaraan.add(new Mobil("XPND-02", "Mitsubishi Xpander", 400000, true, 7));
+        daftarKendaraan.add(new Mobil("BRIO-03", "Honda Brio", 250000, true, 5));
 
         boolean run = true;
 
@@ -42,7 +47,7 @@ public class Main {
                             jumlahKursi = input.nextInt(); input.nextLine();
                             daftarKendaraan.add(new Mobil(kode, nama, hargaPerHari, true, jumlahKursi));
                         } else if (tipeKendaraan.equalsIgnoreCase("motor")) {
-                            String kode, nama; long hargaPerHari; boolean matic;
+                            String kode, nama; long hargaPerHari; boolean matic = false;
                             System.out.print("Masukkan kode: ");
                             kode = input.nextLine();
                             System.out.print("Masukkan nama: ");
@@ -50,16 +55,41 @@ public class Main {
                             System.out.print("Masukkan harga per hari: ");
                             hargaPerHari = input.nextLong(); input.nextLine();
                             System.out.print("Masukkan jenis transmisi (matic/manual): ");
-                            String sMatic  = input.nextLine();
-                            matic = sMatic.equalsIgnoreCase("matic");
+                            try {
+                                String sMatic  = input.nextLine();
+                                if (sMatic.equalsIgnoreCase("matic")) {
+                                    matic = true;
+                                } else if (sMatic.equalsIgnoreCase("manual")) {
+                                    matic = false;
+                                } else {
+                                    throw new NoSuchElementException("ERROR: Pilihan tidak valid.");
+                                }
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
+                                try {
+                                    Thread.sleep(1500);
+                                } catch (InterruptedException ex) {
+                                    System.out.println(ex.getMessage());
+                                }
+                            }
                             daftarKendaraan.add(new Motor(kode, nama, hargaPerHari, true, matic));
                         } else {
                             throw new NoSuchElementException("ERROR: Pilihan tidak valid.");
                         }
                     } catch (InputMismatchException e) {
                         System.out.println("ERROR: Input harus berupa angka.");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                     } catch (NoSuchElementException e) {
                         System.out.println(e.getMessage());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                     }
                     break;
                 case 2: //tampilkan semua armada
@@ -78,16 +108,17 @@ public class Main {
                     for (Kendaraan k: daftarKendaraan) {
                         if (k.isAvailable()) {
                             adaYangBisaDisewakan = true;
+                            System.out.println(k);
                         }
                     }
-                    if (adaYangBisaDisewakan) {
-                        for (Kendaraan k: daftarKendaraan) {
-                            if (k.isAvailable()) {
-                                System.out.println(k);
-                            }
-                        }
-                    } else {
+                    
+                    if (!adaYangBisaDisewakan) {
                         System.out.println("Tidak ada kendaraan yang tersedia.");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                         break;
                     }
 
@@ -111,30 +142,31 @@ public class Main {
                         }
                     } catch (NoSuchElementException e) {
                         System.out.println(e.getMessage());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                        continue;
                     }
 
                     System.out.print("Masukkan lama sewa (hari): ");
                     int hariSewa = input.nextInt(); input.nextLine();
                     System.out.println("Apakah anda memiliki member VIP? (y/n)");
                     String strVip = input.nextLine();
-                    boolean isVip = false;
-                    if (strVip.equalsIgnoreCase("y")) {
-                        isVip = true;
-                    } else if (strVip.equalsIgnoreCase("n")){
-                        isVip = false;
-                    }
+                    boolean isVip = strVip.equalsIgnoreCase("y");
+                    
                     for (Kendaraan k: daftarKendaraan) {
                         if (k.getKode().equalsIgnoreCase(kodeSewa)) {
-                            if (k instanceof Mobil) {
-                                System.out.println(((Mobil) k).sewaKendaraan(hariSewa, isVip));
-                                kodeSewa = k.getKode();
-                            } else if (k instanceof Motor) {
-                                System.out.println(((Motor) k).sewaKendaraan(hariSewa, isVip));
-                                kodeSewa = k.getKode();
-                            }
+                            System.out.println(k.sewaKendaraan(hariSewa, isVip));
                         }
                     }
                     System.out.println("Kendaraan " + kodeSewa + " berhasil disewa");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        System.out.println(ex.getMessage());
+                    }
                     break;
                 case 4: //kembalikan kendaraan
                     System.out.println("===Daftar Kendaraan yang Sedang Disewa===");
@@ -142,17 +174,17 @@ public class Main {
                     for (Kendaraan k: daftarKendaraan) {
                         if (!k.isAvailable()) {
                             adaYangLagiDisewa = true;
-                            break;
+                            System.out.println(k);
                         }
                     }
-                    if (adaYangLagiDisewa) {
-                        for (Kendaraan k: daftarKendaraan) {
-                            if (!k.isAvailable()) {
-                                System.out.println(k);
-                            }
-                        }
-                    } else {
+
+                    if (!adaYangLagiDisewa) {
                         System.out.println("Tidak ada kendaraan yang sedang disewa.");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
                         break;
                     }
 
@@ -175,6 +207,12 @@ public class Main {
                         }
                     } catch (NoSuchElementException e) {
                         System.out.println(e.getMessage());
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                        continue;
                     }
                     break;
                 case 5: //keluar

@@ -43,7 +43,7 @@ public abstract class Kendaraan {
     @Override
     public String toString() {
         String statusStr = status ? "Tersedia" : "Disewa";
-        return String.format("[%s] Kode: %-8s | Nama: %-15s | Status: %-9s | ", 
+        return String.format("[%s] Kode: %-8s | Nama: %-15s | Status: %-8s | ",
                 tipeKendaraan, kode, nama, statusStr);
     }
 
