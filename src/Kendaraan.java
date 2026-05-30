@@ -27,25 +27,24 @@ public abstract class Kendaraan {
         return (long) (sewaDasar(hariSewa) * 0.2);
     }
 
+    String diskonVipFormatted(int hariSewa) {
+        return String.format("%,d", hitungDiskonVip(hariSewa));
+    }
+
     public abstract String sewaKendaraan(int hariSewa, boolean isVip);
 
     public String sewaKendaraan(int hariSewa) {
         return "===STRUK TRANSAKSI SEWA KENDARAAN===\n" +
-        "Unit         : " + nama + "(" + kode + ")\n"
+        "Unit         : " + nama + " (" + kode + ")\n"
         + "Lama Sewa    : " + hariSewa + " hari\n" +
         "Biaya Dasar  : Rp ";
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        Formatter f = new Formatter(sb);
-        sb.append("[").append(tipeKendaraan).append("] Kode: ");
-        f.format("%-8s", kode);
-        sb.append(" | Nama: ");
-        f.format("%-15s", nama);
-        sb.append(" | ");
-        return sb.toString();
+        String statusStr = status ? "Tersedia" : "Disewa";
+        return String.format("[%s] Kode: %-8s | Nama: %-15s | Status: %-9s | ", 
+                tipeKendaraan, kode, nama, statusStr);
     }
 
     public String getKode() {
@@ -72,7 +71,7 @@ public abstract class Kendaraan {
         this.hargaPerHari = hargaPerHari;
     }
 
-    public boolean isStatus() {
+    public boolean isAvailable() {
         return status;
     }
 
