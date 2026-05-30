@@ -1,83 +1,68 @@
-import java.util.Formatter;
 
 public abstract class Kendaraan {
-    String kode;
-    String nama;
-    long hargaPerHari;
-    boolean status;
-    String tipeKendaraan;
+    private String kodeKendaraan;
+    private String namaKendaraan;
+    private double hargaSewaPerHari;
+    private boolean isTersedia;
+    protected String tipeKendaraan;
 
-    public Kendaraan(String kode, String nama, long hargaPerHari, boolean status) {
-        this.kode = kode;
-        this.nama = nama;
-        this.hargaPerHari = hargaPerHari;
-        this.status = status;
+    public Kendaraan(String kode, String nama, double hargaSewa) {
+        this.kodeKendaraan = kode;
+        this.namaKendaraan = nama;
+        this.hargaSewaPerHari = hargaSewa;
+        this.isTersedia = true;
     }
 
-    long sewaDasar(int hariSewa) {
-        return hariSewa * hargaPerHari;
+    public String getKodeKendaraan() {
+        return kodeKendaraan;
     }
 
-    public String kembalikanKendaraan(String kode) {
-        this.status = true;
-        return "Kendaraan " + nama + " (" + kode + ") telah dikembalikan";
+    public void setKodeKendaraan(String kode) {
+        this.kodeKendaraan = kode;
     }
 
-    long hitungDiskonVip(int hariSewa) {
-        return (long) (sewaDasar(hariSewa) * 0.2);
+    public String getNamaKendaraan() {
+        return namaKendaraan;
     }
 
-    String diskonVipFormatted(int hariSewa) {
-        return String.format("%,d", hitungDiskonVip(hariSewa));
+    public void setNamaKendaraan(String nama) {
+        this.namaKendaraan = nama;
     }
 
-    public abstract String sewaKendaraan(int hariSewa, boolean isVip);
-
-    public String sewaKendaraan(int hariSewa) {
-        return "===STRUK TRANSAKSI SEWA KENDARAAN===\n" +
-        "Unit         : " + nama + " (" + kode + ")\n"
-        + "Lama Sewa    : " + hariSewa + " hari\n" +
-        "Biaya Dasar  : Rp ";
+    public double getHargaSewaPerHari() {
+        return hargaSewaPerHari;
     }
 
-    @Override
-    public String toString() {
-        String statusStr = status ? "Tersedia" : "Disewa";
-        return String.format("[%s] Kode: %-8s | Nama: %-15s | Status: %-8s | ",
-                tipeKendaraan, kode, nama, statusStr);
+    public void setHargaSewaPerHari(double harga) {
+        this.hargaSewaPerHari = harga;
     }
 
-    public String getKode() {
-        return kode;
+    public boolean isTersedia() {
+        return isTersedia;
     }
 
-    public void setKode(String kode) {
-        this.kode = kode;
+    public void setTersedia(boolean status) {
+        this.isTersedia = status;
     }
 
-    public String getNama() {
-        return nama;
+    public void tampilInfo() {
+        String statusStr = isTersedia ? "Tersedia" : "Disewa";
+        System.out.printf("[%s] Kode: %-8s | Nama: %-15s | Status: %-8s | ",
+                tipeKendaraan, kodeKendaraan, namaKendaraan, statusStr);
     }
 
-    public void setNama(String nama) {
-        this.nama = nama;
+    public abstract double hitungBiayaDasar(int lamaSewa);
+
+    protected double hitungDiskonVip(int lamaSewa) {
+        return (hargaSewaPerHari * lamaSewa) * 0.2;
     }
 
-    public long getHargaPerHari() {
-        return hargaPerHari;
+    public String sewaKendaraan(int lamaSewa, boolean isVip) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("===STRUK TRANSAKSI SEWA KENDARAAN===\n");
+        sb.append("Unit         : ").append(namaKendaraan).append(" (").append(kodeKendaraan).append(")\n");
+        sb.append("Lama Sewa    : ").append(lamaSewa).append(" hari\n");
+        sb.append("Biaya Dasar  : Rp ").append(String.format("%,.0f", hargaSewaPerHari * lamaSewa));
+        return sb.toString();
     }
-
-    public void setHargaPerHari(long hargaPerHari) {
-        this.hargaPerHari = hargaPerHari;
-    }
-
-    public boolean isAvailable() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    abstract long hitungBiaya(int hariSewa, boolean isVip);
 }

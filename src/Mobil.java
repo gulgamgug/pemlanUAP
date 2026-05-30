@@ -1,10 +1,8 @@
-import java.util.Formatter;
-
 public class Mobil extends Kendaraan {
-    int jumlahKursi;
+    private int jumlahKursi;
 
-    public Mobil(String kode, String nama, long hargaPerHari, boolean status, int jumlahKursi) {
-        super(kode, nama, hargaPerHari, status);
+    public Mobil(String kode, String nama, double harga, int jumlahKursi) {
+        super(kode, nama, harga);
         this.jumlahKursi = jumlahKursi;
         tipeKendaraan = "Mobil";
     }
@@ -13,40 +11,41 @@ public class Mobil extends Kendaraan {
         return jumlahKursi;
     }
 
-    @Override
-    public String sewaKendaraan(int hariSewa, boolean isVip) {
-        String fBiayaDasar = String.format("%,d", this.sewaDasar(hariSewa));
-        String lineSewaKursi = "";
-        String lineVip = "";
-        if (jumlahKursi>5) {
-            lineSewaKursi = "\nTambahan Kursi (>5): Rp 50.000";
-        }
-        if (isVip) {
-            lineVip = "\nDiskon Member VIP (20%): " + diskonVipFormatted(hariSewa);
-        }
-        String fGrdTotal = String.format("%,d", hitungBiaya(hariSewa, isVip));
-        status = false;
-        return super.sewaKendaraan(hariSewa) + fBiayaDasar + lineSewaKursi
-                + lineVip + "\n---------------------------------------------"
-                + "\nGrand Total: Rp " + fGrdTotal;
+    public void setJumlahKursi(int jumlahKursi) {
+        this.jumlahKursi = jumlahKursi;
     }
 
     @Override
-    public String toString() {
-        return super.toString() + String.format("Kursi: %-3s| Tarif: Rp%,d/hari", 
-                jumlahKursi, hargaPerHari);
+    public void tampilInfo() {
+        super.tampilInfo();
+        System.out.printf("Kursi: %-3s| Tarif: Rp%,.0f/hari\n", jumlahKursi, getHargaSewaPerHari());
     }
 
     @Override
-    long hitungBiaya(int hariSewa, boolean isVip) {
-        long biayaDasar = hariSewa * hargaPerHari;
-        if (jumlahKursi>5) {
-            biayaDasar += 50000;
+    public double hitungBiayaDasar(int lamaSewa) {
+        double biaya = getHargaSewaPerHari() * lamaSewa;
+        if (jumlahKursi > 5) {
+            biaya += 50000;
         }
+        return biaya;
+    }
+
+    @Override
+    public String sewaKendaraan(int lamaSewa, boolean isVip) {
+        String baseStr = super.sewaKendaraan(lamaSewa, isVip);
+        StringBuilder sb = new StringBuilder(baseStr);
+        if (jumlahKursi > 5) {
+            sb.append("\nTambahan Kursi (>5): Rp 50.000");
+        }
+        double total = hitungBiayaDasar(lamaSewa);
         if (isVip) {
-            return biayaDasar - hitungDiskonVip(hariSewa);
-        } else {
-            return biayaDasar;
+            double diskon = hitungDiskonVip(lamaSewa);
+            sb.append("\nDiskon Member VIP (20%): ").append(String.format("%,.0f", diskon));
+            total -= diskon;
         }
+        sb.append("\n---------------------------------------------");
+        sb.append("\nGrand Total: Rp ").append(String.format("%,.0f", total));
+        setTersedia(false);
+        return sb.toString();
     }
 }

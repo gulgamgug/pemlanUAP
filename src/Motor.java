@@ -1,50 +1,51 @@
-import java.util.Formatter;
-
 public class Motor extends Kendaraan {
-    boolean transmisi;
+    private String jenisTransmisi;
 
-    public Motor(String kode, String nama, long hargaPerHari, boolean status, boolean matic) {
-        super(kode, nama, hargaPerHari, status);
-        this.transmisi = matic;
+    public Motor(String kode, String nama, double harga, String jenisTransmisi) {
+        super(kode, nama, harga);
+        this.jenisTransmisi = jenisTransmisi;
         tipeKendaraan = "Motor";
     }
 
-    @Override
-    public String toString() {
-        String transmisiStr = transmisi ? "Matic" : "Manual";
-        return super.toString() + String.format("Transmisi: %-6s| Tarif: Rp%,d/hari", 
-                transmisiStr, hargaPerHari);
+    public String getJenisTransmisi() {
+        return jenisTransmisi;
+    }
+
+    public void setJenisTransmisi(String jenis) {
+        this.jenisTransmisi = jenis;
     }
 
     @Override
-    long hitungBiaya(int hariSewa, boolean isVip) {
-        long biayaDasar = hargaPerHari * hariSewa;
-        if (transmisi) {
-            biayaDasar += (10000L *hariSewa);
-        }
-        if (isVip) {
-            return biayaDasar - hitungDiskonVip(hariSewa);
-        } else {
-            return biayaDasar;
-        }
+    public void tampilInfo() {
+        super.tampilInfo();
+        System.out.printf("Transmisi: %-6s| Tarif: Rp%,.0f/hari\n", jenisTransmisi, getHargaSewaPerHari());
     }
 
     @Override
-    public String sewaKendaraan(int hariSewa, boolean isVip) {
-        String fBiayaDasar = String.format("%,d", this.sewaDasar(hariSewa));
-        String lineTransmisi = "";
-        String lineVip = "";
-        String fTransmisi = String.format("%,d", (10000L*hariSewa));
-        if (transmisi) {
-            lineTransmisi = "\nBiaya Asuransi (10.000/hari): Rp " + fTransmisi;
+    public double hitungBiayaDasar(int lamaSewa) {
+        double biaya = getHargaSewaPerHari() * lamaSewa;
+        if (jenisTransmisi.equalsIgnoreCase("matic")) {
+            biaya += (10000.0 * lamaSewa);
         }
+        return biaya;
+    }
+
+    @Override
+    public String sewaKendaraan(int lamaSewa, boolean isVip) {
+        String baseStr = super.sewaKendaraan(lamaSewa, isVip);
+        StringBuilder sb = new StringBuilder(baseStr);
+        if (jenisTransmisi.equalsIgnoreCase("matic")) {
+            sb.append("\nBiaya Asuransi (10.000/hari): Rp ").append(String.format("%,.0f", 10000.0 * lamaSewa));
+        }
+        double total = hitungBiayaDasar(lamaSewa);
         if (isVip) {
-            lineVip = "\nDiskon Member VIP (20%): " + diskonVipFormatted(hariSewa);
+            double diskon = hitungDiskonVip(lamaSewa);
+            sb.append("\nDiskon Member VIP (20%): ").append(String.format("%,.0f", diskon));
+            total -= diskon;
         }
-        String fGrdTotal = String.format("%,d", hitungBiaya(hariSewa, isVip));
-        status = false;
-        return super.sewaKendaraan(hariSewa) + fBiayaDasar + lineTransmisi
-                + lineVip + "\n---------------------------------------------"
-                + "\nGrand Total: Rp " + fGrdTotal;
+        sb.append("\n---------------------------------------------");
+        sb.append("\nGrand Total: Rp ").append(String.format("%,.0f", total));
+        setTersedia(false);
+        return sb.toString();
     }
 }
